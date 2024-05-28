@@ -7,26 +7,31 @@ import { Loader } from "./components/Loader/Loader";
 import { fetchImagesByQuery } from "./api";
 import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn";
 import ImageModal from "./components/ImageModal/ImageModal";
+import { ApiResponseType, ImageType, ImgInfoType } from "./types";
 
 function App() {
-  const [images, setImages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [loadMoreBtn, setLoadMoreBtn] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [imgInfo, setImgInfo] = useState({});
-  const [imgModalIsOpen, setImgModalIsOpen] = useState(false);
+  const [images, setImages] = useState<ImageType[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [loadMoreBtn, setLoadMoreBtn] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [imgModalIsOpen, setImgModalIsOpen] = useState<boolean>(false);
+  const [imgInfo, setImgInfo] = useState<ImgInfoType>({
+    srcImgModal: "",
+    description: "",
+    likes: 0,
+    author: "",
+  });
   const per_page = 12;
 
-   const handleSearch = (query) => {
+  const handleSearch = (query: string) => {
     if (query !== "" && query !== searchQuery) {
       setSearchQuery(query);
       setImages([]);
-      setCurrentPage(1)
-         }
-      };
+    }
+  };
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -34,7 +39,7 @@ function App() {
         setIsError(false);
         setIsLoading(true);
         setLoadMoreBtn(false);
-        const response = await fetchImagesByQuery(
+        const response: ApiResponseType = await fetchImagesByQuery(
           currentPage,
           per_page,
           searchQuery
@@ -65,20 +70,20 @@ function App() {
     if (searchQuery !== "") fetchImages();
   }, [searchQuery, currentPage]);
 
-  const handleLoadMore = () => {
+  const handleLoadMore = (): void => {
     setCurrentPage((prevPage) => prevPage + 1);
   };
 
-  const handleOnImgClick = (image) => {
+  const handleOnImgClick = (image: ImgInfoType) => {
     setImgInfo(image);
     openImgModal();
   };
 
-  const openImgModal = () => {
+  const openImgModal = (): void => {
     setImgModalIsOpen(true);
   };
 
-  const closeImgModal = () => {
+  const closeImgModal = (): void => {
     setImgModalIsOpen(false);
   };
 
@@ -93,13 +98,11 @@ function App() {
       {searchQuery !== "" && loadMoreBtn && (
         <LoadMoreBtn onLoadMore={handleLoadMore} />
       )}
-      {
-        <ImageModal
-          onImgModalOpen={imgModalIsOpen}
-          onImgModalClose={closeImgModal}
-          {...imgInfo}
-        />
-      }
+      <ImageModal
+        onImgModalOpen={imgModalIsOpen}
+        onImgModalClose={closeImgModal}
+        {...imgInfo}
+      />
     </div>
   );
 }
